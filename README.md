@@ -1,6 +1,4 @@
-\# 🧠 Fine-Tuning T5 Transformer for Text Summarization
-
-
+# 🧠 Fine-Tuning T5 Transformer for Text Summarization
 
 !\[Fine-Tuned T5 Banner](Images/ChatGPT Image Nov 2, 2025, 10\_02\_31 PM.png)
 
@@ -20,7 +18,7 @@
 
 
 
-\## 🏁 Overview
+## 🏁 Overview
 
 
 
@@ -38,13 +36,11 @@ Unlike extractive summarization, where sentences are selected from the original 
 
 
 
-\## ⚙️ Core Idea: Text-to-Text Framework
+## ⚙️ Core Idea: Text-to-Text Framework
 
 
 
 The \*\*T5 (Text-to-Text Transfer Transformer)\*\* model, proposed by Google Research, treats every NLP task as a \*\*text-to-text\*\* problem:
-
-
 
 | Task | Input Format | Output Format |
 
@@ -56,8 +52,6 @@ The \*\*T5 (Text-to-Text Transfer Transformer)\*\* model, proposed by Google Res
 
 | QA | `"question: Who invented AI? context: ..."` | `"John McCarthy"` |
 
-
-
 This unified approach allows a single model architecture to handle diverse NLP tasks.
 
 
@@ -66,9 +60,7 @@ This unified approach allows a single model architecture to handle diverse NLP t
 
 
 
-\## 🧩 Project Features
-
-
+## 🧩 Project Features
 
 ✅ Fine-tunes `t5-small` on a summarization dataset  
 
@@ -82,47 +74,18 @@ This unified approach allows a single model architecture to handle diverse NLP t
 
 ✅ Clean modular code with \*\*configurable parameters\*\* and \*\*logging\*\*
 
-
-
 ---
 
-
-
-\## 📁 Directory Structure
-
-
+## 📁 Directory Structure
 
 > \*\*Note:\*\* Keep your screenshots inside the `Images/` folder.
-
-
-
 ...
-
-
-
 Fine-Tuning--T5-Transformer-for-Text-Summarization/ │ ├── Images/ │ ├── ChatGPT Image Nov 2, 2025, 10\_02\_31 PM.png │ ├── app\_demo\_1.png │ ├── app\_demo\_2.png │ ├── app\_demo\_3.png │ ├── training\_log\_1.png │ ├── training\_log\_2.png │ ├── training\_log\_3.png │ └── transformer\_architecture.png │ ├── training\_script.ipynb ├── eval\_results.json (optional) ├── .gitignore └── README.md
-
-
-
 ...
 
-
-
----
-
-
-
----
-
-
-
-\## 🧠 Model Architecture
-
-
+## 🧠 Model Architecture
 
 \*\*T5 (Text-to-Text Transfer Transformer)\*\* is based on the Transformer encoder-decoder structure.
-
-
 
 \- \*\*Encoder:\*\* Converts the input text into contextual embeddings  
 
@@ -130,23 +93,13 @@ Fine-Tuning--T5-Transformer-for-Text-Summarization/ │ ├── Images/ │ �
 
 \- \*\*Objective:\*\* Minimize the cross-entropy loss between predicted and target summaries  
 
-
-
 (Optional diagram)
-
-
 
 !\[Transformer Architecture](Images/transformer\_architecture.png)
 
-
-
 ---
 
-
-
-\## 🧮 Dataset Preparation
-
-
+## 🧮 Dataset Preparation
 
 Any dataset containing pairs of \*text → summary\* can be used.  
 
@@ -161,7 +114,6 @@ The input data should contain at least two columns:
 Example (from CNN/DailyMail or custom dataset):
 
 
-
 ```python
 
 {
@@ -172,43 +124,23 @@ Example (from CNN/DailyMail or custom dataset):
 
 }
 
-
-
 ---
 
-
-
----
-
-
-
-\## 🧰 Installation \& Setup
-
-
+## 🧰 Installation \& Setup
 
 Run the following in your Colab or local environment:
 
-
-
-```bash
-
 pip install transformers datasets evaluate sentencepiece accelerate
 
-
-
 Mount Google Drive if using Colab:
-
-
 
 from google.colab import drive
 
 drive.mount('/content/drive')
 
+---
 
-
-🔧 Configuration (config.py)
-
-
+## Configuration (config.py)
 
 class Config:
 
@@ -232,13 +164,9 @@ class Config:
 
 ---
 
-
-
-🧹 Data Preprocessing \& Tokenization
+## 🧹 Data Preprocessing \& Tokenization
 
 Each article-summary pair is preprocessed and tokenized:
-
-
 
 def preprocess\_function(examples):
 
@@ -246,35 +174,22 @@ def preprocess\_function(examples):
 
 &nbsp;   model\_inputs = tokenizer(inputs, max\_length=512, truncation=True)
 
-
-
 &nbsp;   labels = tokenizer(text\_target=examples\["summary"], max\_length=150, truncation=True)
 
 &nbsp;   model\_inputs\["labels"] = labels\["input\_ids"]
 
-
-
 &nbsp;   return model\_inputs
 
 
-
 Then processed using:
-
-
 
 tokenized\_train = dataset\["train"].map(preprocess\_function, batched=True)
 
 tokenized\_val = dataset\["validation"].map(preprocess\_function, batched=True)
 
-
-
 ---
 
-
-
 🏋️‍♀️ Training Setup
-
-
 
 training\_args = TrainingArguments(
 
@@ -306,21 +221,13 @@ training\_args = TrainingArguments(
 
 )
 
-
-
 ---
 
-
-
-📏 Evaluation Metrics (ROUGE)
+## 📏 Evaluation Metrics (ROUGE)
 
 We use ROUGE (Recall-Oriented Understudy for Gisting Evaluation) — the standard summarization metric. It measures the overlap between model-generated and reference summaries.
 
-
-
 rouge = evaluate.load("rouge")
-
-
 
 def compute\_metrics(eval\_pred):
 
@@ -338,15 +245,10 @@ def compute\_metrics(eval\_pred):
 
 &nbsp;   return {k: v \* 100 for k, v in result.items()}
 
-
-
 ---
 
 
-
-🚀 Training the Model
-
-
+## 🚀 Training the Model
 
 trainer = Trainer(
 
@@ -364,27 +266,17 @@ trainer = Trainer(
 
 )
 
-
-
 train\_result = trainer.train()
 
 trainer.save\_model(config.OUTPUT\_DIR)
 
 tokenizer.save\_pretrained(config.OUTPUT\_DIR)
 
-
-
 ---
 
-
-
-\### Sample Output During Training
-
-
+### Sample Output During Training
 
 > (You can replace this table with your own results)
-
-
 
 | Step | Training Loss | Validation Loss | ROUGE-1 | ROUGE-2 | ROUGE-L |
 
@@ -396,19 +288,11 @@ tokenizer.save\_pretrained(config.OUTPUT\_DIR)
 
 | 1500 | 1.866         | 1.780           | 42.40   | 20.12   | 29.97   |
 
-
-
 ---
 
-
-
-\## 💾 Saving \& Uploading to Google Drive
-
-
+## 💾 Saving \& Uploading to Google Drive
 
 After training:
-
-
 
 ```python
 
@@ -423,16 +307,13 @@ os.makedirs(destination, exist\_ok=True)
 shutil.copytree(source, destination, dirs\_exist\_ok=True)
 
 
-
 ---
 
-\## 🔍 Model Evaluation \& Results
+## 🔍 Model Evaluation \& Results
 
 
 
-\### Interpretation
-
-
+\## Interpretation
 
 \* \*\*Training Loss\*\* → model fits data well  
 
@@ -449,21 +330,18 @@ shutil.copytree(source, destination, dirs\_exist\_ok=True)
 \*\*Output:\*\*
 
 
-
 > “T5 unifies NLP tasks into a single text-to-text model framework.”
-
 
 
 ---
 
 
 
-\## 🖥️ App Demo Screenshots (Input → Generated Summary)
+## 🖥️ App Demo Screenshots (Input → Generated Summary)
 
 
 
 Put your UI screenshots here (from your app demo).
-
 
 
 !\[App Demo 1](Images/1.png)
@@ -471,8 +349,6 @@ Put your UI screenshots here (from your app demo).
 !\[App Demo 2](Images/2.png)
 
 !\[App Demo 3](Images/3.png)
-
-
 
 (Your UI screenshots in your context)  
 
@@ -482,18 +358,12 @@ Put your UI screenshots here (from your app demo).
 
 \- App Demo screenshot 3: https://www.genspark.ai/api/files/s/OeMyxA75  
 
-
-
 ---
 
-
-
-\## 🖼️ Output Images (Training Logs / Metrics)
-
+## 🖼️ Output Images (Training Logs / Metrics)
 
 
 Separate section for your training output screenshots.
-
 
 
 !\[Training Output a](Images/a.png)
@@ -502,13 +372,10 @@ Separate section for your training output screenshots.
 
 !\[Training Output c](Images/c.png)
 
-
-
 ---
 
 
-
-\## 🧰 Troubleshooting
+## 🧰 Troubleshooting
 
 
 
@@ -524,13 +391,9 @@ Separate section for your training output screenshots.
 
 | `Low ROUGE scores`                     | Model undertrained                | Increase epochs or try T5-base                                     |
 
-
-
 ---
 
-
-
-\## 📈 Future Improvements
+## 📈 Future Improvements
 
 
 
@@ -542,15 +405,9 @@ Separate section for your training output screenshots.
 
 \* 🔹 Deploy via \*\*Streamlit\*\* or \*\*Gradio demo\*\*  
 
-
-
 ---
 
-
-
-\## 📚 References
-
-
+## 📚 References
 
 \* \[T5 Paper: Exploring the Limits of Transfer Learning](https://arxiv.org/abs/1910.10683)  
 
@@ -558,19 +415,4 @@ Separate section for your training output screenshots.
 
 \* \[Evaluate: ROUGE Metric](https://huggingface.co/spaces/evaluate-metric/rouge)  
 
-
-
 ---
-
-
-
-Agar aap chaho to main aapke `Images` folder ki \*\*actual file names\*\* ke mutabiq is README me `Images/1.png`, `Images/a.png` etc. ko \*\*exact match\*\* karwa doon—bas PowerShell me ye chala ke output paste kar dein:
-
-
-
-```powershell
-
-dir .\\Images
-
-
-
